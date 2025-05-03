@@ -1,4 +1,6 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
@@ -26,10 +28,10 @@ async def list_agents():
     return {
         "agents": [
             {
-                "agent": maru.__str__(),
+                "agent": maru
             },
             {
-                "agent": ethan.__str__(),
+                "agent": ethan
             }
         ]
     }
@@ -38,15 +40,56 @@ async def list_agents():
 async def get_agent_info(agent_name: str):
     """Get information about a specific agent"""
     try:
-        agent = agent_list[0]
-        return{
-            "agent": agent.__str__(),
+        agent = get_agent(agent_name)
+        agent_data = jsonable_encoder(
+            agent,
+            exclude_none = True,
+        )
+        return JSONResponse(
+            content=agent_data,
+        )
+    except ValueError:
+        raise HTTPException(status_code=404, detail=f"Agent {agent_name} not found")
+
+
+def get_agent(agent_name: str):
+    """Get a specific agent by name"""
+    try:
+        agent = next(agent for agent in agent_list if agent.name.lower() == agent_name.lower())
+        return agent
+    except ValueError:
+        raise HTTPException(status_code=404, detail=f"Agent {agent_name} not found")
+
+@app.post("/agent/{agent_name}/analyze_emotion")
+async def analyze_emotion(agent_name: str, prompt: str):
+    """Analyze the emotion of a specific agent"""
+    print(f"Analyzing emotion for agent: {agent_name} with prompt: {prompt}")
+    try:
+        agent = get_agent(agent_name)
+        result = agent.analyze_emotion(prompt)
+        return {
+            "valence": result[0],
+            "arousal": result[1],
+            "dominance": result[2]
         }
     except ValueError:
         raise HTTPException(status_code=404, detail=f"Agent {agent_name} not found")
 
+@app.post("/agent/{agent_name}/generate_emotion")
+async def generate_emotion(agent_name: str, prompt: str):
+    """Generate emotion for a specific agent"""
+    try:
+        agent = get_agent(agent_name)
+        result = agent.generate_emotion(prompt)
+        # return {
+        #     "emotion": result
+        # }
+        return result
+    except ValueError:
+        raise HTTPException(status_code=404, detail=f"Agent {agent_name} not found")
+
 if __name__ == "__main__":
-    uvicorn.run(
+    uvicorn.run(    
         "main:app", 
         host="127.0.0.1", 
         port=8000

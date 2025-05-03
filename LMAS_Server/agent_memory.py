@@ -19,8 +19,11 @@ class AgentMemory(BaseModel):
         default_factory=list, description="Long-term memory of the agent"
     )
     
-# for pydantic_v1
+    # for pydantic_v1
     class Config:
         arbitrary_types_allowed = True
     # for pydantic_v2
     # model_config = {"arbitrary_types_allowed": True}
+    
+    def __str__(self):
+        return self.dict()

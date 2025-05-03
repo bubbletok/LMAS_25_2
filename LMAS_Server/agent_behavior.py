@@ -4,6 +4,7 @@ from typing import Optional, List, Dict, Tuple
 class AgentBehavior(BaseModel):
     """Agent Behavior class for managing agent's behavior."""
     # name: str = Field(description="Name of the agent")
+    recent_summary: str = Field(default="", description="Recent summary of the agent's actions")
     
     # for pydantic_v1
     class Config:
@@ -16,3 +17,6 @@ class AgentBehavior(BaseModel):
     #     # self.agent.memory.update(summary)
     #     # self.agent.behavior.act(summary)
     #     return f"Acting on the summary: {summary}"
+
+    def __str__(self):
+        return self.dict()

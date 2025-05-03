@@ -7,26 +7,22 @@ from agent_vad import AgentVAD
 
 from langchain_community.chat_models import ChatOllama
 
-agent_llm_model_name = "tinyllama"
-vad_agent_model_name = "tinyllama"
+agent_llm_model_name = "phi4-mini"
+vad_agent_model_name = "phi4-mini"
 agent_chat_llm = ChatOllama(model = agent_llm_model_name)
 vad_agent_chat_llm = ChatOllama(model = vad_agent_model_name)
+
+vad_chat = AgentChat(llm=vad_agent_chat_llm)
+vad_agent = AgentVAD(chat=vad_chat)
 
 maru_chat = AgentChat(llm=agent_chat_llm)
 maru_memory = AgentMemory()
 maru_behavior = AgentBehavior()
 maru_planner = AgentPlanner()
 
-ethan_chat = AgentChat(llm=agent_chat_llm)
-ethan_memory = AgentMemory()
-ethan_behavior = AgentBehavior()
-ethan_planner = AgentPlanner()
-
-vad_chat = AgentChat(llm=vad_agent_chat_llm)
-vad_agent = AgentVAD(chat=vad_chat)
-
+# For Test
 maru = Agent(
-    name="Maru",
+    name="maru",
     age=5,
     chat=maru_chat,
     memory=maru_memory,
@@ -35,8 +31,15 @@ maru = Agent(
     vad=vad_agent,
 )
 
+ethan_chat = AgentChat(llm=agent_chat_llm)
+ethan_memory = AgentMemory()
+ethan_behavior = AgentBehavior()
+ethan_planner = AgentPlanner()
+
+
+
 ethan = Agent(
-    name="Ethan",
+    name="ethan",
     age=25,
     chat=ethan_chat,
     memory=ethan_memory,
