@@ -1,4 +1,5 @@
 from langchain_core.documents import Document
+from langchain_core.prompts import PromptTemplate
 # from pydantic import BaseModel, Field
 from langchain_core.pydantic_v1 import BaseModel, Field
 from typing import Optional, List, Dict, Tuple
@@ -20,9 +21,8 @@ class AgentVAD(BaseModel):
     # for pydantic_v2
     # model_config = {"arbitrary_types_allowed": True}
     
-    def _analyze_emotion(self, name: str, prompt: str) -> Tuple[float, float, float]:
+    def _analyze_emotion(self, name: str, text: str) -> Tuple[float, float, float]:
         """Analyze the emotion of the prompt."""
-        text = prompt  # your original text to analyze
         prompt = f'''
         You are an emotion‐analysis model based on the Valence‐Arousal‐Dominance framework.
         Internally think step by step, but DO NOT output any of that reasoning.
@@ -44,16 +44,20 @@ class AgentVAD(BaseModel):
         '''
         # The definition of valence, arousal, dominance is from
         # https://pubmed.ncbi.nlm.nih.gov/23404613/#:~:text=Three%20components%20of%20emotions%20are,control%20exerted%20by%20a%20stimulus).
-        # print(prompt)
+        
         response = self.chat.llm.invoke(prompt)
         result = response.content
-        # print(result)
-        # return result
-        json_result = json.loads(result)
-        # return json_result
+        
+        # try:
+        #     print(f'prompt: {prompt}')
+        #     result = self.chat._chain(prompt).invoke({"text": text})
+        # except Exception as e:
+        #     raise ValueError(f"Error invoking LLM: {e}")
+        
         # Parse the result to extract valence, arousal, and dominance
+        json_result = json.loads(result)
         try:
-            valence, arousal, dominance = json_result["valence"], json_result["arousal"], json_result["dominance"]                
+            valence, arousal, dominance = json_result["valence"], json_result["arousal"], json_result["dominance"]
             self.valence[name] = valence
             self.arousal[name] = arousal
             self.dominance[name] = dominance

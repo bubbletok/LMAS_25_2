@@ -48,4 +48,9 @@ ethan = Agent(
     vad=vad_agent,
 )
 
+agent_dict = {
+    "maru": maru,
+    "ethan": ethan
+}
+
 agent_list = [maru, ethan]

@@ -55,7 +55,8 @@ async def get_agent_info(agent_name: str):
 def get_agent(agent_name: str):
     """Get a specific agent by name"""
     try:
-        agent = next(agent for agent in agent_list if agent.name.lower() == agent_name.lower())
+        agent = agent_dict[agent_name]
+        # agent = next(agent for agent in agent_list if agent.name.lower() == agent_name.lower())
         return agent
     except ValueError:
         raise HTTPException(status_code=404, detail=f"Agent {agent_name} not found")
