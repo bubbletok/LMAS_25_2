@@ -89,6 +89,27 @@ async def generate_emotion(agent_name: str, prompt: str):
     except ValueError:
         raise HTTPException(status_code=404, detail=f"Agent {agent_name} not found")
 
+@app.post("/agent/{agent_name}/observe")
+async def observe(agent_name: str, observation: str, time: float):
+    """Observe the environment and update memory for a specific agent"""
+    try:
+        agent = get_agent(agent_name)
+        result = agent.observe(observation, time)
+        return result
+    except ValueError:
+        raise HTTPException(status_code=404, detail=f"Agent {agent_name} not found")
+
+@app.post("/agent/{agent_name}/summary")
+async def get_summary(agent_name: str):
+    """Get the summary of a specific agent's memory"""
+    try:
+        agent = get_agent(agent_name)
+        result = agent.get_summary()
+        return result
+    except ValueError:
+        raise HTTPException(status_code=404, detail=f"Agent {agent_name} not found")
+
+
 if __name__ == "__main__":
     uvicorn.run(    
         "main:app", 

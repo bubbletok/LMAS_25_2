@@ -17,20 +17,4 @@ class AgentChat(BaseModel):
     
     def _chain(self, prompt: PromptTemplate) -> Runnable:
         return prompt | self.llm.invoke(prompt) | StrOutputParser()
-    
-    # def __init__(self, model_name: str):
-    #     self.model_name = model_name
-    #     self.llm = ChatOllama(model=model_name)
-        # self.chat_prompt = ChatPromptTemplate.from_messages([
-        #     ("system", "You are a helpful assistant."),
-        #     ("user", "{input}"),
-        #     ("assistant", "{output}")
-        # ])
-        # self.output_parser = StrOutputParser()
-    
-    # def chat(self, prompt: str) -> str:
-    #     """Chat with the agent using the provided prompt."""
-    #     # response = self.llm.invoke(prompt)
-    #     # return response
-    #     pass
         

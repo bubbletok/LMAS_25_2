@@ -20,3 +20,7 @@ class AgentBehavior(BaseModel):
 
     def __str__(self):
         return self.dict()
+    
+    def act(self, summary: str) -> str:
+        """Perform the action and update memory."""
+        pass

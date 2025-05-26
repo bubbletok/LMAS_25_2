@@ -29,6 +29,18 @@ namespace LMAS.Scripts.Manager
             return null;
         }
 
+        public void UpdateAgent(string agentName, AgentInfo agentInfo)
+        {
+            if (m_AgentDictionary.ContainsKey(agentName))
+            {
+                m_AgentDictionary[agentName] = agentInfo;
+            }
+            else
+            {
+                AddAgent(agentName, agentInfo);
+            }
+        }
+
         public void AddAgent(string agentName, AgentInfo agentInfo)
         {
             if (!m_AgentDictionary.ContainsKey(agentName))
@@ -36,6 +48,7 @@ namespace LMAS.Scripts.Manager
                 m_AgentDictionary.Add(agentName, agentInfo);
             }
         }
+
 
         public void RemoveAgent(string agentName)
         {

@@ -8,14 +8,11 @@ using LMAS.Scripts.Manager;
 using LMAS.Scripts.Agent.Settings;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
-using LMAS.Scripts.Agent.Debugger;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
 using UnityEngine.Events;
 
 namespace LMAS.Scripts.Agent
 {
-    public class LLMAgent : MonoBehaviour
+    public class LLMAgent : LMASObject
     {
         #region Properties
         [Header("Agent Settings")]
@@ -33,12 +30,23 @@ namespace LMAS.Scripts.Agent
         [HideInInspector] public LLMAgentVAD AgentVAD => m_AgentVAD;
 
         private Vector3 m_AgentWorldPos;
+        public Vector3 AgentWorldPos => m_AgentWorldPos;
         private Vector3Int m_AgentTilePos;
+        public Vector3Int AgentTilePos => m_AgentTilePos;
+
+        // TEST
+        private LLMAgentController m_AgentController;
         #endregion
 
         #region Unity Methods
         void Awake()
         {
+            // TEST
+            m_AgentController = GetComponent<LLMAgentController>();
+            m_AgentController.Agent = this;
+
+            Type = LMASType.Agent;
+
             AddAgentComponents();
             StartCoroutine(LoadAgentInfo());
         }
@@ -117,9 +125,29 @@ namespace LMAS.Scripts.Agent
                     debug += $"Chat: {agentInfo.Chat}\n";
                     debug += $"LLM: {agentInfo.Chat.LLM}\n";
                     debug += $"Memory: {string.Join(", ", agentInfo.Memory)}\n";
-                    debug += $"Working Memory: {string.Join(", ", agentInfo.Memory.WorkingMemory)}\n";
-                    debug += $"Mid Term Memory: {string.Join(", ", agentInfo.Memory.MiddleTermMemory)}\n";
-                    debug += $"Long Term Memory: {string.Join(", ", agentInfo.Memory.LongTermMemory)}\n";
+                    string FormatMemoryList(string label, List<MemoryData> memoryList)
+                    {
+                        if (memoryList == null || memoryList.Count == 0)
+                            return $"{label}:\n- None\n";
+
+                        var lines = new List<string> { $"{label}:" };
+                        foreach (var memory in memoryList)
+                        {
+                            if (memory == null || memory.Metadata == null) continue;
+
+                            string contentPreview = memory.PageContent.Length > 100
+                                ? memory.PageContent.Substring(0, 100) + "..."
+                                : memory.PageContent;
+
+                            lines.Add($"- [Type: {memory.Type}]");
+                            lines.Add($"  Content: {contentPreview}");
+                            lines.Add($"  Importance: {memory.Metadata.Importance:F3}, Time: {memory.Metadata.time:F3}");
+                        }
+                        return string.Join("\n", lines) + "\n";
+                    }
+                    debug += FormatMemoryList("Working Memory", agentInfo.Memory.WorkingMemory);
+                    debug += FormatMemoryList("Mid-Term Memory", agentInfo.Memory.MiddleTermMemory);
+                    debug += FormatMemoryList("Long-Term Memory", agentInfo.Memory.LongTermMemory);
                     debug += $"Behavior: {string.Join(", ", agentInfo.Behavior)}\n";
                     debug += $"Recent Summary: {agentInfo.Behavior.RecentSummary}\n";
                     debug += $"Planner: {string.Join(", ", agentInfo.Planner)}\n";
@@ -136,7 +164,7 @@ namespace LMAS.Scripts.Agent
                     debug += $"VAD Chat: {string.Join(", ", agentInfo.Vad.Chat)}\n";
                     Debug.Log(debug);
 
-                    DebugManager.Instance.AddAgent(agentName, agentInfo);
+                    DebugManager.Instance.UpdateAgent(agentName, agentInfo);
                     isSucceed = true;
                 }
                 else
@@ -173,6 +201,11 @@ namespace LMAS.Scripts.Agent
                 {
                     Debug.Log($"Collider at {m_AgentTilePos}: {collider}");
                 }
+            }
+
+            if (Input.GetKeyDown(KeyCode.L))
+            {
+                StartCoroutine(LoadAgentInfo());
             }
         }
 

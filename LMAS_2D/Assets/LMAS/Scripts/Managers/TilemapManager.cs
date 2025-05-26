@@ -56,14 +56,14 @@ namespace LMAS.Scripts.Manager
             int dirNum = 9; // Number of directions to check (8 surrounding + center)
             int[] dx = { -1, 0, 1, -1, 0, 1, -1, 0, 1 };
             int[] dy = { -1, -1, -1, 0, 0, 0, 1, 1, 1 };
-            List<Collider2D> colliders = new List<Collider2D>();
+            HashSet<Collider2D> colliders = new HashSet<Collider2D>();
             for (int i = 0; i < dirNum; i++)
             {
                 Vector3Int newPos = new Vector3Int(centerPos.x + dx[i], centerPos.y + dy[i], centerPos.z);
                 List<Collider2D> surroundingColliders = GetCollidersOnTile(newPos);
                 colliders.AddRange(surroundingColliders);
             }
-            return colliders;
+            return colliders.ToList();
         }
 
         public List<Collider2D> GetCollidersOnTile(Vector3Int centerPos)
@@ -177,6 +177,24 @@ namespace LMAS.Scripts.Manager
                 }
             }
             return tiles;
+        }
+
+        public List<TileBase> GetSurroundingTiles(Vector3Int centerPos)
+        {
+            List<TileBase> surroundingTiles = new List<TileBase>();
+            int dirNum = 8; // Number of directions to check (8 surrounding)
+            int[] dx = { -1, 0, 1, -1, 1, -1, 0, 1 };
+            int[] dy = { -1, -1, -1, 0, 0, 1, 1, 1 };
+            for (int i = 0; i < dirNum; i++)
+            {
+                Vector3Int newPos = new Vector3Int(centerPos.x + dx[i], centerPos.y + dy[i], centerPos.z);
+                var tiles = GetTiles(newPos);
+                if (tiles != null)
+                {
+                    surroundingTiles.AddRange(tiles);
+                }
+            }
+            return surroundingTiles;
         }
     }
 }

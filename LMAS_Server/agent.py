@@ -38,38 +38,33 @@ class Agent(BaseModel):
     """
     _observe: Observe the environment and update memory.
     """
-    def observe(self, observation: str) -> str:
+    def observe(self, observation: str, time: float) -> str:
         """Observe the environment and update memory."""
-        # self.memory.update(observation)
-        return 
+        emotion = self.generate_emotion(observation)
+        return self.memory.update_memory(observation, emotion, time)
     
     def act(self, summary: str) -> str:
         """Perform the action and update memory."""
-        # self.behavior.act(summary)
+        self.behavior.act(summary)
         return
     
-    def plan(self, summary: str, goal: str) -> str:
+    def plan(self, summary: str) -> str:
         """Plan the next steps to achieve the goal."""
-        # self.planner.plan(summary, goal)
+        self.planner._make_plan(summary)
         return
     
     def analyze_emotion(self, prompt: str) -> str:
         """Analyze the emotion of the prompt."""
-        result = self.vad._analyze_emotion(self.name, prompt)
+        result = self.vad.analyze_emotion(self.name, prompt)
         return result
     
     def generate_emotion(self, prompt: str) -> str:
         """Get the emotion of the prompt."""
         # (v, a, d) = self.vad.analyze_emotion(self.name, prompt)
         # return f"Valence: {v}, Arousal: {a}, Dominance: {d}"
-        result = self.vad._generate_emotion(self.name, prompt)
+        result = self.vad.generate_emotion(self.name, prompt)
         return result
     
-    # def _test_chat(self, prompt: str) -> str:
-    #     """Test the chat model."""
-    #     # result = self.vad.chat.llm.invoke(prompt).content
-    #     # return result
-    #     # (v, a, d) = self.vad.analyze_emotion(self.name, prompt)
-    #     # return f"Valence: {v}, Arousal: {a}, Dominance: {d}"
-    #     result = self.vad.analyze_emotion(self.name, prompt)
-    #     return result
+    def get_summary(self) -> str:
+        """Get the summary of the agent's memory."""
+        return self.memory.get_summary()

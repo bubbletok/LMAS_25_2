@@ -36,6 +36,8 @@ namespace LMAS.Scripts.Manager
                 // Call the simulation step method with the time since the last frame
                 SimulationStep(Time.deltaTime);
             }
+
+            m_SimulationTime += Time.deltaTime;
         }
 
         private void FixedUpdate()
@@ -47,6 +49,8 @@ namespace LMAS.Scripts.Manager
                 // Call the simulation step method with the fixed delta time
                 SimulationStep(Time.fixedDeltaTime);
             }
+
+            m_SimulationTime += Time.fixedDeltaTime;
         }
 
         protected override void OnDestroy()

@@ -21,7 +21,7 @@ class AgentVAD(BaseModel):
     # for pydantic_v2
     # model_config = {"arbitrary_types_allowed": True}
     
-    def _analyze_emotion(self, name: str, text: str) -> Tuple[float, float, float]:
+    def analyze_emotion(self, name: str, text: str) -> Tuple[float, float, float]:
         """Analyze the emotion of the prompt."""
         prompt = f'''
         You are an emotion‐analysis model based on the Valence‐Arousal‐Dominance framework.
@@ -65,10 +65,10 @@ class AgentVAD(BaseModel):
             raise ValueError("Invalid response format from LLM")
         return (valence, arousal, dominance)
        
-    def _generate_emotion(self, name: str, prompt: str) -> str:
+    def generate_emotion(self, name: str, prompt: str) -> str:
         """Generate emotion based on valence, arousal, and dominance."""
         # First, Analyze the valence, arousal, and dominance from the prompt
-        (valence, arousal, dominance) = self._analyze_emotion(name, prompt)
+        (valence, arousal, dominance) = self.analyze_emotion(name, prompt)
         
         # Second, Generate emotion based on valence, arousal, and dominance
         prompt = f'''You are an emotion classification model that maps Valence-Arousal-Dominance values to emotion words.

@@ -14,6 +14,9 @@ namespace LMAS.Scripts.Agent.Debugger
         GUIStyle sectionHeaderStyle;
         GUIStyle labelStyle;
         GUIStyle boxStyle;
+
+        float m_LabelWidth = 200f; // 라벨의 기본 너비
+
         void OnGUI()
         {
             sectionHeaderStyle = new GUIStyle(GUI.skin.label)
@@ -59,11 +62,11 @@ namespace LMAS.Scripts.Agent.Debugger
             GUILayout.BeginVertical(boxStyle);
             GUILayout.Label("Agent Info", sectionHeaderStyle);
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Name:", labelStyle, GUILayout.Width(100));
+            GUILayout.Label("Name:", labelStyle, GUILayout.Width(m_LabelWidth));
             GUILayout.Label(m_currentAgent.Name, labelStyle);
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Age:", labelStyle, GUILayout.Width(100));
+            GUILayout.Label("Age:", labelStyle, GUILayout.Width(m_LabelWidth));
             GUILayout.Label(m_currentAgent.Age.ToString(), labelStyle);
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
@@ -72,7 +75,7 @@ namespace LMAS.Scripts.Agent.Debugger
             GUILayout.BeginVertical(boxStyle);
             GUILayout.Label("Chat", sectionHeaderStyle);
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Model:", labelStyle, GUILayout.Width(100));
+            GUILayout.Label("Model:", labelStyle, GUILayout.Width(m_LabelWidth));
             GUILayout.Label(m_currentAgent.Chat.LLM.Model, labelStyle);
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
@@ -80,26 +83,26 @@ namespace LMAS.Scripts.Agent.Debugger
             // ──────────── Memory ────────────
             GUILayout.BeginVertical(boxStyle);
             GUILayout.Label("Memory", sectionHeaderStyle);
-            void DrawList(string title, System.Collections.Generic.List<string> list)
-            {
-                GUILayout.BeginHorizontal();
-                GUILayout.Label(title + ":", labelStyle, GUILayout.Width(100));
-                string txt = (list != null && list.Count > 0)
-                    ? string.Join(", ", list)
-                    : "None";
-                GUILayout.Label(txt, labelStyle);
-                GUILayout.EndHorizontal();
-            }
-            DrawList("Working", m_currentAgent.Memory.WorkingMemory);
-            DrawList("Mid-term", m_currentAgent.Memory.MiddleTermMemory);
-            DrawList("Long-term", m_currentAgent.Memory.LongTermMemory);
+            DrawMemoryList("Working", m_currentAgent.Memory.WorkingMemory);
+            DrawMemoryList("Mid-term", m_currentAgent.Memory.MiddleTermMemory);
+            DrawMemoryList("Long-term", m_currentAgent.Memory.LongTermMemory);
+            GUILayout.Label("Model:", labelStyle, GUILayout.Width(m_LabelWidth));
+            GUILayout.Label(m_currentAgent.Memory.Chat.LLM.Model, labelStyle);
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Consolidate Threshold:", labelStyle, GUILayout.Width(180));
+            GUILayout.Label(m_currentAgent.Memory.ConsolidateThreshold.ToString("F2"), labelStyle);
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Importance Score Weight:", labelStyle, GUILayout.Width(180));
+            GUILayout.Label(m_currentAgent.Memory.ImportanceScoreWeight.ToString("F2"), labelStyle);
+            GUILayout.EndHorizontal();
             GUILayout.EndVertical();
 
             // ──────────── Behavior ────────────
             GUILayout.BeginVertical(boxStyle);
             GUILayout.Label("Behavior", sectionHeaderStyle);
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Recent:", labelStyle, GUILayout.Width(100));
+            GUILayout.Label("Recent:", labelStyle, GUILayout.Width(m_LabelWidth));
             GUILayout.Label(string.IsNullOrEmpty(m_currentAgent.Behavior.RecentSummary)
                              ? "None"
                              : m_currentAgent.Behavior.RecentSummary,
@@ -115,7 +118,7 @@ namespace LMAS.Scripts.Agent.Debugger
                 foreach (var kv in m_currentAgent.Planner.Plan)
                 {
                     GUILayout.BeginHorizontal();
-                    GUILayout.Label(kv.Key + ":", labelStyle, GUILayout.Width(100));
+                    GUILayout.Label(kv.Key + ":", labelStyle, GUILayout.Width(m_LabelWidth));
                     GUILayout.Label(kv.Value, labelStyle);
                     GUILayout.EndHorizontal();
                 }
@@ -160,12 +163,39 @@ namespace LMAS.Scripts.Agent.Debugger
             GUILayout.Space(8);
             GUILayout.Label("VAD.Chat", sectionHeaderStyle);
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Model:", labelStyle, GUILayout.Width(100));
+            GUILayout.Label("Model:", labelStyle, GUILayout.Width(m_LabelWidth));
             GUILayout.Label(m_currentAgent.Vad.Chat.LLM.Model, labelStyle);
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
 
             GUILayout.EndScrollView();
+        }
+
+        void DrawMemoryList(string title, List<MemoryData> memoryList)
+        {
+            GUILayout.Label($"== {title} Memory ==", sectionHeaderStyle);
+
+            if (memoryList == null || memoryList.Count == 0)
+            {
+                GUILayout.Label("None", labelStyle);
+                return;
+            }
+
+            foreach (var memory in memoryList)
+            {
+                if (memory == null || memory.Metadata == null)
+                    continue;
+
+                GUILayout.BeginVertical(boxStyle);
+
+                GUILayout.Label($"Content: {memory.PageContent}", labelStyle);
+                GUILayout.Label($"Type: {memory.Type}", labelStyle);
+                GUILayout.Label($"Importance: {memory.Metadata.Importance:F2}", labelStyle);
+                GUILayout.Label($"Time: {memory.Metadata.time:F2}", labelStyle);
+
+                GUILayout.EndVertical();
+                GUILayout.Space(4);
+            }
         }
     }
 }

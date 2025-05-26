@@ -16,9 +16,12 @@ vad_chat = AgentChat(llm=vad_agent_chat_llm)
 vad_agent = AgentVAD(chat=vad_chat)
 
 maru_chat = AgentChat(llm=agent_chat_llm)
-maru_memory = AgentMemory()
+maru_memory = AgentMemory(chat=maru_chat)
 maru_behavior = AgentBehavior()
 maru_planner = AgentPlanner()
+
+# Memory Test
+# maru_memory.update_memory("I am a cat", 0.5)
 
 # For Test
 maru = Agent(
@@ -32,11 +35,9 @@ maru = Agent(
 )
 
 ethan_chat = AgentChat(llm=agent_chat_llm)
-ethan_memory = AgentMemory()
+ethan_memory = AgentMemory(retriever=Agent,chat=ethan_chat)
 ethan_behavior = AgentBehavior()
 ethan_planner = AgentPlanner()
-
-
 
 ethan = Agent(
     name="ethan",
