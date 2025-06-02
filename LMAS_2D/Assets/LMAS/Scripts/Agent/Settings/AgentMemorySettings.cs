@@ -32,6 +32,8 @@ namespace LMAS.Scripts.Agent.Settings
         public List<MemoryData> MiddleTermMemory;
         [JsonProperty("long_term_memory")]
         public List<MemoryData> LongTermMemory;
+        [JsonProperty("recent_summary")]
+        public List<string> RecentSummary;
         [JsonProperty("chat")]
         public AgentChat Chat;
         [JsonProperty("consolidate_threshold")]

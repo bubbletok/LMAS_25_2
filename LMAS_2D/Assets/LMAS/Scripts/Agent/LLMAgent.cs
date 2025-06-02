@@ -148,8 +148,9 @@ namespace LMAS.Scripts.Agent
                     debug += FormatMemoryList("Working Memory", agentInfo.Memory.WorkingMemory);
                     debug += FormatMemoryList("Mid-Term Memory", agentInfo.Memory.MiddleTermMemory);
                     debug += FormatMemoryList("Long-Term Memory", agentInfo.Memory.LongTermMemory);
+                    debug += $"Recent Summary: {agentInfo.Memory.RecentSummary}\n";
                     debug += $"Behavior: {string.Join(", ", agentInfo.Behavior)}\n";
-                    debug += $"Recent Summary: {agentInfo.Behavior.RecentSummary}\n";
+                    debug += $"Chat: {string.Join(", ", agentInfo.Behavior.Chat)}\n";
                     debug += $"Planner: {string.Join(", ", agentInfo.Planner)}\n";
                     debug += $"Plan: {string.Join(", ", agentInfo.Planner.Plan)}\n";
                     debug += $"VAD: {string.Join(", ", agentInfo.Vad)}\n";
@@ -218,9 +219,9 @@ namespace LMAS.Scripts.Agent
 
         public void UpdateAgentPosition()
         {
-            m_AgentWorldPos = TilemapManager.Instance.GetTilemapWorldPos(transform.position);
+            m_AgentWorldPos = TilemapManager.Instance.GetWorldPosOnTilemap(transform.position);
 
-            m_AgentTilePos = TilemapManager.Instance.GetTilemapPos(m_AgentWorldPos);
+            m_AgentTilePos = TilemapManager.Instance.GetPosOnTilemap(m_AgentWorldPos);
             if (m_AgentTilePos == Vector3.negativeInfinity)
             {
                 Debug.LogError("Agent position is not on any tilemap. Please check the tilemap configuration.");

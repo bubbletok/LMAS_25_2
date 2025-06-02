@@ -43,15 +43,17 @@ class Agent(BaseModel):
         emotion = self.generate_emotion(observation)
         return self.memory.update_memory(observation, emotion, time)
     
-    def act(self, summary: str) -> str:
+    def act(self, current_time: float) -> str:
         """Perform the action and update memory."""
-        self.behavior.act(summary)
-        return
+        plan = self.planner.plan
+        all_memory = self.memory.get_all_memory()
+        return self.behavior.act(plan, all_memory, current_time)
     
-    def plan(self, summary: str) -> str:
+    def plan(self, current_time: float) -> str:
         """Plan the next steps to achieve the goal."""
-        self.planner._make_plan(summary)
-        return
+        all_summary = self.memory.get_all_summary()
+        print(f"Planning with all summary: {all_summary} at time: {current_time}")
+        return self.planner.make_plan(all_summary, current_time)
     
     def analyze_emotion(self, prompt: str) -> str:
         """Analyze the emotion of the prompt."""

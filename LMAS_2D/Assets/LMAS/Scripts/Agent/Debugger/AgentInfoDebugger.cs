@@ -9,13 +9,14 @@ namespace LMAS.Scripts.Agent.Debugger
     {
         [SerializeField] private string m_AgentName;
         private Vector2 m_ScrollPos = Vector2.zero;
-
+        // Memory 전용 스크롤 위치
+        private Vector2 m_MemoryScrollPos = Vector2.zero;
         // GUIStyles
         GUIStyle sectionHeaderStyle;
         GUIStyle labelStyle;
         GUIStyle boxStyle;
 
-        float m_LabelWidth = 200f; // 라벨의 기본 너비
+        float m_LabelWidth = 300f; // 라벨의 기본 너비
 
         void OnGUI()
         {
@@ -83,9 +84,29 @@ namespace LMAS.Scripts.Agent.Debugger
             // ──────────── Memory ────────────
             GUILayout.BeginVertical(boxStyle);
             GUILayout.Label("Memory", sectionHeaderStyle);
+
+            float memorySectionHeight = 100f; // 필요에 따라 조정 가능
+            m_MemoryScrollPos = GUILayout.BeginScrollView(
+                m_MemoryScrollPos,
+                GUILayout.Height(memorySectionHeight)
+            );
             DrawMemoryList("Working", m_currentAgent.Memory.WorkingMemory);
             DrawMemoryList("Mid-term", m_currentAgent.Memory.MiddleTermMemory);
             DrawMemoryList("Long-term", m_currentAgent.Memory.LongTermMemory);
+            GUILayout.EndScrollView(); // ▶ Memory 전용 스크롤뷰 끝
+
+            GUILayout.Label("Recent Summary:", labelStyle, GUILayout.Width(m_LabelWidth));
+            if (m_currentAgent.Memory.RecentSummary != null && m_currentAgent.Memory.RecentSummary.Count > 0)
+            {
+                foreach (var summary in m_currentAgent.Memory.RecentSummary)
+                {
+                    GUILayout.Label($"- {summary}", labelStyle);
+                }
+            }
+            else
+            {
+                GUILayout.Label("None", labelStyle);
+            }
             GUILayout.Label("Model:", labelStyle, GUILayout.Width(m_LabelWidth));
             GUILayout.Label(m_currentAgent.Memory.Chat.LLM.Model, labelStyle);
             GUILayout.BeginHorizontal();
@@ -103,30 +124,27 @@ namespace LMAS.Scripts.Agent.Debugger
             GUILayout.Label("Behavior", sectionHeaderStyle);
             GUILayout.BeginHorizontal();
             GUILayout.Label("Recent:", labelStyle, GUILayout.Width(m_LabelWidth));
-            GUILayout.Label(string.IsNullOrEmpty(m_currentAgent.Behavior.RecentSummary)
+            GUILayout.Label(string.IsNullOrEmpty(m_currentAgent.Behavior.RecentAction)
                              ? "None"
-                             : m_currentAgent.Behavior.RecentSummary,
+                             : m_currentAgent.Behavior.RecentAction,
                              labelStyle);
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Model:", labelStyle, GUILayout.Width(m_LabelWidth));
+            GUILayout.Label(m_currentAgent.Behavior.Chat.LLM.Model, labelStyle);
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
 
             // ──────────── Planner ────────────
             GUILayout.BeginVertical(boxStyle);
             GUILayout.Label("Planner", sectionHeaderStyle);
-            if (m_currentAgent.Planner.Plan != null && m_currentAgent.Planner.Plan.Count > 0)
-            {
-                foreach (var kv in m_currentAgent.Planner.Plan)
-                {
-                    GUILayout.BeginHorizontal();
-                    GUILayout.Label(kv.Key + ":", labelStyle, GUILayout.Width(m_LabelWidth));
-                    GUILayout.Label(kv.Value, labelStyle);
-                    GUILayout.EndHorizontal();
-                }
-            }
-            else
-            {
-                GUILayout.Label("No plan items", labelStyle);
-            }
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Plan:", labelStyle, GUILayout.Width(m_LabelWidth));
+            GUILayout.Label(string.IsNullOrEmpty(m_currentAgent.Planner.Plan)
+                             ? "None"
+                             : m_currentAgent.Planner.Plan,
+                             labelStyle);
+            GUILayout.EndHorizontal();
             GUILayout.EndVertical();
 
             // ──────────── VAD ────────────
@@ -187,12 +205,10 @@ namespace LMAS.Scripts.Agent.Debugger
                     continue;
 
                 GUILayout.BeginVertical(boxStyle);
-
                 GUILayout.Label($"Content: {memory.PageContent}", labelStyle);
                 GUILayout.Label($"Type: {memory.Type}", labelStyle);
                 GUILayout.Label($"Importance: {memory.Metadata.Importance:F2}", labelStyle);
                 GUILayout.Label($"Time: {memory.Metadata.time:F2}", labelStyle);
-
                 GUILayout.EndVertical();
                 GUILayout.Space(4);
             }

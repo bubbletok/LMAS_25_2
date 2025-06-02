@@ -8,6 +8,8 @@ namespace LMAS.Scripts.Agent.Settings
     public class AgentPlanner
     {
         [JsonProperty("plan")]
-        public Dictionary<string, string> Plan;
+        public string Plan;
+        [JsonProperty("chat")]
+        public AgentChat Chat;
     }
 }

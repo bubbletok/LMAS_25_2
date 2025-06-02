@@ -17,8 +17,14 @@ vad_agent = AgentVAD(chat=vad_chat)
 
 maru_chat = AgentChat(llm=agent_chat_llm)
 maru_memory = AgentMemory(chat=maru_chat)
-maru_behavior = AgentBehavior()
-maru_planner = AgentPlanner()
+maru_behavior = AgentBehavior(chat=maru_chat)
+maru_planner = AgentPlanner(chat=maru_chat)
+
+maru_memory.add_memory(
+    memory_content="My name is Maru, I am 5 years old",
+    emotion="Neutral",
+    time=0.0
+)
 
 # Memory Test
 # maru_memory.update_memory("I am a cat", 0.5)
@@ -35,9 +41,15 @@ maru = Agent(
 )
 
 ethan_chat = AgentChat(llm=agent_chat_llm)
-ethan_memory = AgentMemory(retriever=Agent,chat=ethan_chat)
-ethan_behavior = AgentBehavior()
-ethan_planner = AgentPlanner()
+ethan_memory = AgentMemory(chat=ethan_chat)
+ethan_behavior = AgentBehavior(chat=ethan_chat)
+ethan_planner = AgentPlanner(chat=ethan_chat)
+
+ethan_memory.add_memory(
+    memory_content="My name is Ethan, I am 25 years old",
+    emotion="Neutral",
+    time=0.0
+)
 
 ethan = Agent(
     name="ethan",

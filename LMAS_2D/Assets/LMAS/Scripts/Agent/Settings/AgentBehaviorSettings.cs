@@ -7,7 +7,9 @@ namespace LMAS.Scripts.Agent.Settings
     [Serializable]
     public class AgentBehavior
     {
-        [JsonProperty("recent_summary")]
-        public string RecentSummary;
+        [JsonProperty("recent_action")]
+        public string RecentAction;
+        [JsonProperty("chat")]
+        public AgentChat Chat;
     }
 }

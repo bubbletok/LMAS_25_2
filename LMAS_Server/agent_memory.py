@@ -23,6 +23,9 @@ class AgentMemory(BaseModel):
     long_term_memory: List[Document] = Field(
         default_factory=list, description="Long-term memory of the agent"
     )
+    recent_summary: List[str] = Field(
+        default_factory=list, description="Recent summaries of the agent's memory")
+        
     chat: AgentChat = Field(description="Chat model for the agent memory")
     
     consolidate_threshold: float = Field(
@@ -60,9 +63,9 @@ class AgentMemory(BaseModel):
         Think step by step:
         1. Consider the type of emotion: for example, "joy" may indicate a celebratory moment, while "regret" may reflect a learning experience.
         2. Examine the memory content for personal significance, consequence, or uniqueness.
-        3. Estimate the importance of the memory on a scale from 0.0 (not important at all) to 1.0 (extremely important).
+        3. Estimate the importance of the memory on a scale from 0.0000 (not important at all) to 1.0000 (extremely important).
 
-        Output only a single float number between 0.0 and 1.0, with no explanation or extra text.
+        Output only a single float number between 0.0000 and 1.0000, with no explanation or extra text.
 
         Emotion: {emotion}  
         Memory: {memory_content}  
@@ -85,16 +88,20 @@ class AgentMemory(BaseModel):
         all_memory = "\n".join([doc.page_content for doc in self.working_memory])
         all_memory = all_memory if all_memory.strip() else '[EMPTY]'
         print(f'All memory: {all_memory}')
-        prompt = f"""
-        You are a helpful assistant that summarizes memory logs.
-
-        Your task is to return a **single, concise summary string** of the following text.
+        prompt = f"""Your task is to return a **single, concise summary string** of the following text.
 
         Instructions:
         - DO NOT explain anything.
         - DO NOT include any extra formatting or labels.
-        - If there are no memories, respond exactly: No memories available.
-
+        - Please summarize as you are in the real world, where you have limited time and resources to process information.
+        - You should respond at your perspective as an agent in the world with all the memories as your past experiences.
+        e.g "Summary: I have been observing the world and gathering information about my surroundings. I have learned about various objects, locations, and interactions with other agents. My memories include important events, emotions, and actions that I have taken in the past."
+        - If there are no memories available, which means the working memory is empty, you should respond exactly: No memories available.
+        - If there are memories available, you should summarize them in a single concise string. No need to include the word "summary" or any other label.
+        - If there are memories available, you must not include "No memories available" in the summary.
+        
+        Your observations as an agent in the environment are as follows:
+                
         Memories:
         \"\"\"
         {all_memory}
@@ -102,7 +109,25 @@ class AgentMemory(BaseModel):
         """
         response = self.chat.llm.invoke(prompt)
         result = response.content
+        self.recent_summary.append(result)
         return result
+    
+    def get_all_summary(self) -> str:
+        """Get all summaries of the agent's memory."""
+        # Placeholder for all summary logic
+        # In a real implementation, this could involve summarizing all memories
+        # For now, we will just return the recent summary as a string
+        if not self.recent_summary:
+            return "No summaries available."
+        return "\n".join(self.recent_summary)
+    
+    def get_all_memory(self) -> List[str]:
+        """Get all memories of the agent."""
+        # Placeholder for all memory logic
+        # In a real implementation, this could involve retrieving all memories
+        # For now, we will just return the working memory as a list of strings
+        return [doc.page_content for doc in self.working_memory]
+        
     
     def consolidate_memory(self, time: float):
         """Consolidate memory based on importance and time."""

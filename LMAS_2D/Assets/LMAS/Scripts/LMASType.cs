@@ -8,9 +8,7 @@ namespace LMAS.Scripts
         Agent,
         Ground,
         Wall,
-        Water,
         Door,
-        Window,
         Item
     }
 

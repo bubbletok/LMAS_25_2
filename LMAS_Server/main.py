@@ -109,6 +109,25 @@ async def get_summary(agent_name: str):
     except ValueError:
         raise HTTPException(status_code=404, detail=f"Agent {agent_name} not found")
 
+@app.post("/agent/{agent_name}/plan")
+async def plan(agent_name: str, current_time: float):
+    """Plan the next steps to achieve the goal for a specific agent"""
+    try:
+        agent = get_agent(agent_name)
+        result = agent.plan(current_time)
+        return result
+    except ValueError:
+        raise HTTPException(status_code=404, detail=f"Agent {agent_name} not found")
+
+@app.post("/agent/{agent_name}/act")
+async def act(agent_name: str, current_time: float):
+    """Perform the action and update memory for a specific agent"""
+    try:
+        agent = get_agent(agent_name)
+        result = agent.act(current_time)
+        return result
+    except ValueError:
+        raise HTTPException(status_code=404, detail=f"Agent {agent_name} not found")
 
 if __name__ == "__main__":
     uvicorn.run(    
