@@ -10,6 +10,8 @@ using UnityEngine.Networking;
 using Newtonsoft.Json;
 using UnityEngine.Events;
 
+using LMAS.Scripts.Types;
+
 namespace LMAS.Scripts.Agent
 {
     public class LLMAgent : LMASObject
@@ -28,11 +30,16 @@ namespace LMAS.Scripts.Agent
         [HideInInspector] public LLMAgentPlanner AgentPlanner => m_AgentPlanner;
         private LLMAgentVAD m_AgentVAD;
         [HideInInspector] public LLMAgentVAD AgentVAD => m_AgentVAD;
+        private LLMAgentInteractor m_AgentInteractor;
+        [HideInInspector] public LLMAgentInteractor AgentInteractor => m_AgentInteractor;
 
         private Vector3 m_AgentWorldPos;
         public Vector3 AgentWorldPos => m_AgentWorldPos;
         private Vector3Int m_AgentTilePos;
         public Vector3Int AgentTilePos => m_AgentTilePos;
+
+        private bool m_CanDoAction = false;
+        public bool CanDoAction => m_CanDoAction;
 
         // TEST
         private LLMAgentController m_AgentController;
@@ -41,14 +48,13 @@ namespace LMAS.Scripts.Agent
         #region Unity Methods
         void Awake()
         {
-            // TEST
-            m_AgentController = GetComponent<LLMAgentController>();
-            m_AgentController.Agent = this;
-
             Type = LMASType.Agent;
 
             AddAgentComponents();
             StartCoroutine(LoadAgentInfo());
+
+            // TEST
+            m_AgentController.Agent = this;
         }
 
         void Start()
@@ -76,10 +82,15 @@ namespace LMAS.Scripts.Agent
             m_AgentBehavior = gameObject.AddComponent<LLMAgentBehavior>();
             m_AgentPlanner = gameObject.AddComponent<LLMAgentPlanner>();
             m_AgentVAD = gameObject.AddComponent<LLMAgentVAD>();
+            m_AgentInteractor = gameObject.AddComponent<LLMAgentInteractor>();
+
+            // AgentController must be added last to ensure it can access all other components
+            m_AgentController = gameObject.AddComponent<LLMAgentController>();
         }
 
         private IEnumerator LoadAgentInfo()
         {
+            m_CanDoAction = false;
             if (string.IsNullOrWhiteSpace(m_AgentName))
             {
                 Debug.LogWarning("Please enter a valid agent name.");
@@ -104,6 +115,7 @@ namespace LMAS.Scripts.Agent
             }
 
             Debug.Log($"Agent {m_AgentName} info is loaded successfully.");
+            m_CanDoAction = true;
         }
 
         private IEnumerator LoadAgentInfoCoroutine(string agentName, UnityAction<bool> callback = null)
@@ -180,30 +192,6 @@ namespace LMAS.Scripts.Agent
 
         public void HandleInput()
         {
-            if (Input.GetKeyDown(KeyCode.Q))
-            {
-                var tiles = TilemapManager.Instance.GetTiles(m_AgentTilePos);
-                foreach (var tile in tiles)
-                {
-                    Debug.Log($"Tile at {m_AgentTilePos}: {tile}");
-                }
-            }
-
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                var colliders = TilemapManager.Instance.GetCollidersOnTile(m_AgentTilePos);
-                List<Collider2D> collidersOnTile = new List<Collider2D>();
-                foreach (var collider in colliders)
-                {
-                    if (collider.gameObject != gameObject) collidersOnTile.Add(collider);
-                }
-
-                foreach (var collider in collidersOnTile)
-                {
-                    Debug.Log($"Collider at {m_AgentTilePos}: {collider}");
-                }
-            }
-
             if (Input.GetKeyDown(KeyCode.L))
             {
                 StartCoroutine(LoadAgentInfo());
@@ -251,26 +239,49 @@ namespace LMAS.Scripts.Agent
             // 3. Generate action based on the emotional response
             // 4. Execute the action
             // 5. Generate plan based on the action, or go back to step 1
+            Act(deltaTime);
         }
 
-        public void Observe()
+        public void Observe(string observation = "", float deltaTime = 0.0f)
         {
+            if (!m_CanDoAction)
+            {
+                // Debug.LogWarning("Agent cannot perform observations yet. Please wait until the agent info is loaded.");
+                return;
+            }
+            m_CanDoAction = false;
+
+            m_AgentController.Observe(observation, deltaTime, (string result) =>
+            {
+                m_CanDoAction = true;
+            });
         }
 
-        public IEnumerator ObserveCoroutine()
+        public void Act(float deltaTime)
         {
-            // Perform observation logic here
-            yield return null; // Wait for the next frame or a specific condition
+            if (!m_CanDoAction)
+            {
+                // Debug.LogWarning("Agent cannot perform actions yet. Please wait until the agent info is loaded.");
+                return;
+            }
+            m_CanDoAction = false;
+
+            m_AgentController.Act(deltaTime, () =>
+            {
+                string observation = m_AgentController.GetObservation();
+                m_AgentController.Observe(observation, deltaTime, (string result) =>
+                {
+                    OnActionCompleted();
+                });
+
+            });
+
         }
 
-        public void ExecuteAction()
+        public void OnActionCompleted()
         {
-        }
-
-        public IEnumerator ExecuteActionCoroutine()
-        {
-            // Perform action execution logic here
-            yield return null; // Wait for the next frame or a specific condition
+            Debug.Log($"Action completed for agent: {m_AgentName}");
+            m_CanDoAction = true;
         }
     }
 }

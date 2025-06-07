@@ -99,6 +99,7 @@ class AgentMemory(BaseModel):
         - If there are no memories available, which means the working memory is empty, you should respond exactly: No memories available.
         - If there are memories available, you should summarize them in a single concise string. No need to include the word "summary" or any other label.
         - If there are memories available, you must not include "No memories available" in the summary.
+        - Summary should not be longer than 200 words.
         
         Your observations as an agent in the environment are as follows:
                 

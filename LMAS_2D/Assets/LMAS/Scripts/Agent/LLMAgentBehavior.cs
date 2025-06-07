@@ -16,6 +16,14 @@ namespace LMAS.Scripts.Agent
         Talk,
         Interact,
     }
+
+    [Serializable]
+    public class BehaviorData
+    {
+        public string type;
+        public string value;
+    }
+
     public class LLMAgentBehavior : MonoBehaviour
     {
         public void Act(AgentInfo agent, float time, UnityEngine.Events.UnityAction<string> callback)
@@ -49,56 +57,6 @@ namespace LMAS.Scripts.Agent
                 }
             }
             callback?.Invoke(result);
-        }
-
-        /// <summary>
-        /// 한 줄로 주어진 Behavior 정의에서, 첫 번째 토큰(공백 전단어)만 뽑아서 리턴합니다.
-        /// 예:
-        ///   "Move x: 10 y: 20"  → "Move"
-        ///   "Pickup"            → "Pickup"
-        ///   "Talk to Bob. ..."  → "Talk"
-        ///   "None"              → "None"
-        /// </summary>
-        /// <param name="line">파싱할 Behavior 정의 한 줄</param>
-        /// <returns>첫 번째 단어(Behavior의 type) 혹은 빈 문자열</returns>
-        public BehaviorType ParseBehaviorType(string line)
-        {
-            if (string.IsNullOrWhiteSpace(line))
-                return BehaviorType.None;
-
-            // 앞뒤 공백 제거
-            string trimmed = line.Trim();
-
-            // 앞뒤 "" 제거
-            if (trimmed.StartsWith("\"") && trimmed.EndsWith("\""))
-            {
-                trimmed = trimmed.Substring(1, trimmed.Length - 2).Trim();
-            }
-
-            // 공백(스페이스) 기준으로 분리해서 첫 번째 토큰만 가져온다.
-            int firstSpaceIdx = trimmed.IndexOf(' ');
-            string finalType = string.Empty;
-            if (firstSpaceIdx < 0)
-            {
-                // 공백이 없으면, 전체가 type
-                finalType = trimmed;
-            }
-            else
-            {
-                // 공백 이전 부분만 type
-                finalType = trimmed.Substring(0, firstSpaceIdx);
-            }
-
-            if (Enum.TryParse(finalType, true, out BehaviorType behaviorType))
-            {
-                return behaviorType; // 성공적으로 파싱된 경우
-            }
-            else
-            {
-                Debug.LogWarning($"Unknown behavior type: {finalType}");
-                return BehaviorType.None; // 알 수 없는 타입인 경우
-
-            }
         }
     }
 }

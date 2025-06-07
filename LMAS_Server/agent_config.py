@@ -9,13 +9,14 @@ from langchain_community.chat_models import ChatOllama
 
 agent_llm_model_name = "phi4-mini"
 vad_agent_model_name = "phi4-mini"
-agent_chat_llm = ChatOllama(model = agent_llm_model_name)
+# agent_chat_llm = ChatOllama(model = agent_llm_model_name)
 vad_agent_chat_llm = ChatOllama(model = vad_agent_model_name)
 
 vad_chat = AgentChat(llm=vad_agent_chat_llm)
 vad_agent = AgentVAD(chat=vad_chat)
 
-maru_chat = AgentChat(llm=agent_chat_llm)
+maru_chat_llm = ChatOllama(model=agent_llm_model_name)
+maru_chat = AgentChat(llm=maru_chat_llm)
 maru_memory = AgentMemory(chat=maru_chat)
 maru_behavior = AgentBehavior(chat=maru_chat)
 maru_planner = AgentPlanner(chat=maru_chat)
@@ -40,7 +41,9 @@ maru = Agent(
     vad=vad_agent,
 )
 
-ethan_chat = AgentChat(llm=agent_chat_llm)
+
+ethan_chat_llm = ChatOllama(model=agent_llm_model_name)
+ethan_chat = AgentChat(llm=ethan_chat_llm)
 ethan_memory = AgentMemory(chat=ethan_chat)
 ethan_behavior = AgentBehavior(chat=ethan_chat)
 ethan_planner = AgentPlanner(chat=ethan_chat)

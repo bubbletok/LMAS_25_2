@@ -8,7 +8,10 @@ namespace LMAS.Scripts.Agent
 {
     public class LLMAgentPlanner : MonoBehaviour
     {
-        public void Plan(AgentInfo agent, float time, UnityAction<string> callback)
+        string m_RecentPlan;
+        [HideInInspector] public string RecentPlan => m_RecentPlan;
+
+        public void Plan(AgentInfo agent, float time, UnityAction<string> callback = null)
         {
             if (agent == null)
             {
@@ -19,7 +22,7 @@ namespace LMAS.Scripts.Agent
             StartCoroutine(PlanCoroutine(agent.Name, time, callback));
         }
 
-        private IEnumerator PlanCoroutine(string agentName, float time, UnityAction<string> callback)
+        private IEnumerator PlanCoroutine(string agentName, float time, UnityAction<string> callback = null)
         {
             string result = string.Empty;
             string url = APISetting.APIUrl + $"/agent/{agentName}/plan?current_time={time}";
@@ -32,6 +35,7 @@ namespace LMAS.Scripts.Agent
                 {
                     string responseJson = request.downloadHandler.text;
                     result = responseJson;
+                    m_RecentPlan = result;
                 }
                 else
                 {
