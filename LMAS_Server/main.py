@@ -32,6 +32,12 @@ async def list_agents():
             },
             {
                 "agent": ethan
+            },
+            {
+                "agent": anya
+            },
+            {
+                "agent": mike
             }
         ]
     }
@@ -56,7 +62,6 @@ def get_agent(agent_name: str):
     """Get a specific agent by name"""
     try:
         agent = agent_dict[agent_name]
-        # agent = next(agent for agent in agent_list if agent.name.lower() == agent_name.lower())
         return agent
     except ValueError:
         raise HTTPException(status_code=404, detail=f"Agent {agent_name} not found")
@@ -133,5 +138,6 @@ if __name__ == "__main__":
     uvicorn.run(    
         "main:app", 
         host="127.0.0.1", 
-        port=8000
+        port=8000,
+        # workers=4
     )

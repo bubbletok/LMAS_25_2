@@ -1,10 +1,13 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using LMAS.Scripts.Agent.Settings;
+using System.Net.Http;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
+
+using LMAS.Scripts;
+using LMAS.Scripts.Agent.Settings;
+
 namespace LMAS.Scripts.Agent
 {
     public enum BehaviorType
@@ -41,6 +44,16 @@ namespace LMAS.Scripts.Agent
         {
             string result = string.Empty;
             string url = APISetting.APIUrl + $"/agent/{agentName}/act?current_time={time}";
+
+            // AgentAPIClient apiClient = AgentAPIClient.Instance;
+            // if (apiClient != null)
+            // {
+            //     var resp = apiClient.PostAsync(url, new StringContent("", Encoding.UTF8, "application/json"));
+            //     resp.EnsureSuccessStatusCode();
+            //     var text = resp.Content.ReadAsStringAsync();
+            //     result = text.Result;
+            // }
+
             using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
             {
                 request.downloadHandler = new DownloadHandlerBuffer();

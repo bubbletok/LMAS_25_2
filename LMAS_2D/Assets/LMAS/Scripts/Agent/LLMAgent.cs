@@ -217,28 +217,29 @@ namespace LMAS.Scripts.Agent
             }
         }
 
+        // Perform the simulation step logic here
+        // 1. Tilemap 기반 환경 만들기
+        // 2. Tilemap observe하는거 만들기
+        // 3. 현재 observe한거 + 기억에 있는 것들 합쳐서 행동하기
+        // 4. observe한거 + 현재 한 행동 기억에 저장하기
+
+        // 5. 시간이 지남에 따라 working -> mid term -> long term 기억으로 전환하기
+
+        // if Agent has a plan
+        // 1. Observe the environment
+        // 2. Generate action based on the plan, observation
+        // 3. Execute the action
+
+
+        // if Agent has no plan
+        // 1. Observe the environment
+        // 2. Generate emotional response based on the observation
+        // 3. Generate action based on the emotional response
+        // 4. Execute the action
+        // 5. Generate plan based on the action, or go back to step 1
         void SimulationStep(float deltaTime)
         {
-            // Perform the simulation step logic here
-            // 1. Tilemap 기반 환경 만들기
-            // 2. Tilemap observe하는거 만들기
-            // 3. 현재 observe한거 + 기억에 있는 것들 합쳐서 행동하기
-            // 4. observe한거 + 현재 한 행동 기억에 저장하기
 
-            // 5. 시간이 지남에 따라 working -> mid term -> long term 기억으로 전환하기
-
-            // if Agent has a plan
-            // 1. Observe the environment
-            // 2. Generate action based on the plan, observation
-            // 3. Execute the action
-
-
-            // if Agent has no plan
-            // 1. Observe the environment
-            // 2. Generate emotional response based on the observation
-            // 3. Generate action based on the emotional response
-            // 4. Execute the action
-            // 5. Generate plan based on the action, or go back to step 1
             Act(deltaTime);
         }
 
