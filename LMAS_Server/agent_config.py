@@ -29,7 +29,7 @@ vad_agent = AgentVAD(chat=vad_chat)
 # API keys & Settings
 # os.environ["PINECONE_API_KEY"] = "YOUR_API_KEY"
 # os.environ["PINECONE_INDEX_NAME"] = "YOUR_INDEX_NAME"   
-os.environ["OPENAI_API_KEY"] = "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"
+# os.environ["OPENAI_API_KEY"] = "OPENAI_API_KEY"
 
 # OpenAI Embeddings
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
