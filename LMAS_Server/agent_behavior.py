@@ -110,3 +110,11 @@ class AgentBehavior(BaseModel):
             result = "\n".join(result.splitlines()[1:-1]).strip()
         self.recent_action = result
         return self.recent_action
+    
+    def talk(self, message: str) -> str:
+        """Make the agent talk to another agent."""
+        prompt = f"You are an agent in a virtual world. You need to talk to another agent with the following message: {message}"
+        response = self.chat.llm.invoke(prompt)
+        result = response.content.strip()
+        self.recent_action = result
+        return self.recent_action

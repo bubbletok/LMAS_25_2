@@ -9,6 +9,7 @@ using LMAS.Scripts.Types;
 using LMAS.Scripts.TypedTiles;
 using LMAS.Scripts.Utility;
 using UnityEngine.Events;
+using Unity.VisualScripting;
 
 namespace LMAS.Scripts.Agent
 {
@@ -345,8 +346,19 @@ namespace LMAS.Scripts.Agent
                         callback?.Invoke();
                         break;
                     case BehaviorType.Talk:
-                        Debug.Log("Talking: " + value);
-                        callback?.Invoke();
+                        // Debug.Log("Talking: " + value);
+                        (string agentName, string message) = JsonParser.ParseTalk(value);
+                        if (string.IsNullOrEmpty(agentName) || string.IsNullOrEmpty(message))
+                        {
+                            Debug.LogWarning("Invalid talk command format: " + value);
+                            callback?.Invoke();
+                            return;
+                        }
+                        StartCoroutine(m_Behavior.GetReadyToTalk(agentName, message, tilePathFollow, (string value) =>
+                        {
+                            Debug.Log($"Talking to {agentName}: {message}");
+                            callback?.Invoke();
+                        }));
                         break;
                     case BehaviorType.Interact:
                         System.Action interacttionAction = () =>

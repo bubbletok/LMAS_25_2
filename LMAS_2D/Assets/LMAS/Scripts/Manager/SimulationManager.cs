@@ -121,6 +121,11 @@ namespace LMAS.Scripts.Manager
                                    $"Lower Left({lowerLeft}), Lower Right({lowerRight})\n";
                 }
             }
+            foreach (var agent in m_Agents)
+            {
+                observation += $"Agent: {agent.AgentName}, Position: {agent.transform.position}\n";
+            }
+
             Dictionary<string, List<Vector3>> tilePositions = new Dictionary<string, List<Vector3>>();
             foreach (var agent in m_Agents)
             {

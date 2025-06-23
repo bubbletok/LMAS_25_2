@@ -90,6 +90,35 @@ namespace LMAS.Scripts.PathFinder
                 StartCoroutine(FollowPath(path, callback));
         }
 
+        public void MoveToTarget(Vector3 start, Vector3 target, Action callback = null)
+        {
+            Vector3Int startCell = TilemapManager.Instance.GetPosOnTilemap(start);
+            Vector3Int targetCell = TilemapManager.Instance.GetPosOnTilemap(target);
+
+            if (targetCell == new Vector3Int(int.MinValue, int.MinValue, int.MinValue))
+            {
+                Debug.LogWarning("Invalid target cell position: " + target);
+                callback?.Invoke();
+                return;
+            }
+
+            Debug.Log($"시작 좌표: {start}, 목표 좌표: {target}");
+            Debug.Log($"시작 셀: {startCell}, 목표 셀: {targetCell}");
+
+            // AStarTilePathFinder를 이용해 경로 계산
+            List<Vector3Int> path = pathfinder.FindPath(startCell, targetCell);
+            if (path == null || path.Count == 0)
+            {
+                Debug.LogWarning($"경로를 찾을 수 없습니다: start={startCell}, target={targetCell}");
+                callback?.Invoke();
+                return;
+            }
+
+            // 이동 중이 아닐 때만 코루틴으로 실제 이동 시작
+            if (!isMoving)
+                StartCoroutine(FollowPath(path, callback));
+        }
+
 
         private IEnumerator FollowPath(List<Vector3Int> path, Action callback = null)
         {

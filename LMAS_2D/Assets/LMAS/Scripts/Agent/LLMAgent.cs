@@ -284,5 +284,10 @@ namespace LMAS.Scripts.Agent
             Debug.Log($"Action completed for agent: {m_AgentName}");
             m_CanDoAction = true;
         }
+
+        public bool IsReadyToAct()
+        {
+            return m_CanDoAction;
+        }
     }
 }

@@ -2,6 +2,7 @@
 from langchain_core.pydantic_v1 import BaseModel, Field
 
 from agent_chat import AgentChat
+from agent_retriever import AgentRetriever
 from agent_memory import AgentMemory
 from agent_behavior import AgentBehavior
 from agent_planner import AgentPlanner
@@ -13,6 +14,7 @@ class Agent(BaseModel):
     age: int = Field(default=0, description="Age of the agent")
     chat: AgentChat = Field(description="Chat model for the agent")
     memory: AgentMemory = Field(description="Memory model for the agent")
+    retriever: AgentRetriever = Field(description= "Retriever for the agent memory")
     behavior: AgentBehavior = Field(description="Behavior model for the agent")
     planner: AgentPlanner = Field(description="Planner model for the agent")
     vad: AgentVAD = Field(description="VAD model for the agent")
@@ -24,6 +26,7 @@ class Agent(BaseModel):
         json_encoders = {
             AgentChat:    lambda v: v.dict(),
             AgentMemory:  lambda v: v.dict(),
+            AgentRetriever: lambda v: "AgentRetriever",
             AgentBehavior: lambda v: v.dict() if hasattr(v, "dict") else str(v),
             AgentPlanner: lambda v: v.dict(),
             AgentVAD:     lambda v: v.dict(),

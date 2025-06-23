@@ -84,5 +84,27 @@ namespace LMAS.Scripts.Utility
 
             return new Vector2(deltaX, deltaY);
         }
+
+        // "value": "agent_name: Hello!"
+        public static (string, string) ParseTalk(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return (string.Empty, string.Empty);
+
+            // 정규식: "agent_name: message"
+            Regex regex = new Regex(@"^(?<name>[^:]+):\s*(?<message>.+)$");
+            Match match = regex.Match(value);
+
+            if (!match.Success)
+            {
+                Debug.LogWarning("Invalid talk command format: " + value);
+                return (string.Empty, string.Empty);
+            }
+
+            string agentName = match.Groups["name"].Value.Trim();
+            string message = match.Groups["message"].Value.Trim();
+
+            return (agentName, message);
+        }
     }
 }

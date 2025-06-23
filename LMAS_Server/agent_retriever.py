@@ -7,7 +7,7 @@ from copy import deepcopy
 
 class AgentRetriever(BaseRetriever):
     """Agent retriever for retrieving information from the agent's memory."""
-    vectorstore : VectorStore
+    vectorstore : VectorStore = Field(description="Vector store for the agent's memory")
     alpha_recency: float = Field(default=1) 
     alpha_importance : float = Field(default=0.01)
     alpha_vad: float = Field(default=0.1)
@@ -19,6 +19,19 @@ class AgentRetriever(BaseRetriever):
     
     class Config:
         arbitrary_types_allowed = True
+        
+        json_encoders = {
+            VectorStore: lambda vs: {
+                # vs 가 langchain_community.vectorstores.faiss.FAISS 라면
+                "index_name": repr(vs.index),        # repr 으로 핵심 정보
+                "ntotal": vs.index.ntotal,           # 인덱스에 담긴 벡터 개수
+                "d": vs.index.d,                     # 차원 수
+            },
+        }
+    
+    def json():
+        return __dict__()
+    
         
     def _get_combined_score(self, document: Document, current_time: float) -> float:
         times_passed = current_time - document.metadata.get("last_accessed_at") #self._get_times_passed(current_time, self._document_get_date("last_accessed_at", document))

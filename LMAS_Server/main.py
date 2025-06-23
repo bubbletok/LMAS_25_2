@@ -8,7 +8,6 @@ from agent_config import *
 
 app = FastAPI()
 
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -54,8 +53,8 @@ async def get_agent_info(agent_name: str):
         return JSONResponse(
             content=agent_data,
         )
-    except ValueError:
-        raise HTTPException(status_code=404, detail=f"Agent {agent_name} not found")
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=f'error: {e}')
 
 
 def get_agent(agent_name: str):
@@ -130,6 +129,16 @@ async def act(agent_name: str, current_time: float):
     try:
         agent = get_agent(agent_name)
         result = agent.act(current_time)
+        return result
+    except ValueError:
+        raise HTTPException(status_code=404, detail=f"Agent {agent_name} not found")
+    
+@app.post("/agent/{agent_name}/Talk")
+async def talk(agent_name: str, message: str):
+    """Make the agent talk to another agent"""
+    try:
+        agent = get_agent(agent_name)
+        result = agent.talk(message)
         return result
     except ValueError:
         raise HTTPException(status_code=404, detail=f"Agent {agent_name} not found")

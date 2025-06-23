@@ -6,12 +6,11 @@ from typing import Optional, List, Dict, Tuple
 import re
 
 from agent_chat import AgentChat
-# from agent_retreiver import AgentRetriever
+# from agent_retriever import AgentRetriever
 
 class AgentMemory(BaseModel):
     """Agent memory for storing and retrieving information."""
     # name: str = Field(description="Name of the agent")
-    # retriever: AgentRetriever = Field(description="Retriever for the agent memory")
     working_memory: List[Document] = Field(
         default_factory=list, description="Working memory of the agent"
     )
@@ -144,6 +143,7 @@ class AgentMemory(BaseModel):
                 # Move to mid-term memory
                 self.mid_term_memory.append(working_doc)
                 self.working_memory.remove(working_doc)
+                # self.
         for doc in self.working_memory:
             print(f"Memory: {doc.page_content}, Importance: {doc.metadata['importance']}, Time: {doc.metadata['time']}")
         
